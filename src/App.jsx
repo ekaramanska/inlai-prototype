@@ -7,6 +7,8 @@ import RiskResult from './pages/RiskResult'
 import Obligations from './pages/Obligations'
 import ActionPlan from './pages/ActionPlan'
 import Dashboard from './pages/Dashboard'
+import Updates from './pages/Updates'
+import Profile from './pages/Profile'
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
           <Route path="/obligations" element={<Obligations />} />
           <Route path="/action-plan" element={<ActionPlan />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/updates" element={<Updates />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>
