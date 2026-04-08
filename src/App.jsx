@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import Onboarding from './pages/Onboarding'
 import Assessment from './pages/Assessment'
+import Questionnaire from './pages/Questionnaire'
 import RiskResult from './pages/RiskResult'
 import Obligations from './pages/Obligations'
 import ActionPlan from './pages/ActionPlan'
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/assessment" element={<Assessment />} />
+          <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/risk-result" element={<RiskResult />} />
           <Route path="/obligations" element={<Obligations />} />
           <Route path="/action-plan" element={<ActionPlan />} />

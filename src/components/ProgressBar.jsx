@@ -1,4 +1,4 @@
-const steps = ['Company', 'AI System', 'Risk Level', 'Obligations', 'Action Plan']
+const steps = ['Company', 'AI System', 'Questionnaire', 'Risk Level', 'Obligations', 'Action Plan']
 
 export default function ProgressBar({ current }) {
   return (

@@ -28,7 +28,7 @@ export default function Assessment() {
     const highestRisk = selectedSystems.reduce((max, s) => {
       return riskOrder.indexOf(s.risk) > riskOrder.indexOf(max) ? s.risk : max
     }, 'minimal')
-    navigate('/risk-result', { state: { risk: highestRisk, selected } })
+    navigate('/questionnaire', { state: { risk: highestRisk, selected } })
   }
 
   return (

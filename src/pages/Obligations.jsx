@@ -24,7 +24,7 @@ export default function Obligations() {
 
   return (
     <div className="py-12 px-4 sm:px-6">
-      <ProgressBar current={4} />
+      <ProgressBar current={5} />
 
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
