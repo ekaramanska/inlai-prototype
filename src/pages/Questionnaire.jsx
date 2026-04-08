@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, HelpCircle } from 'lucide-react'
 import ProgressBar from '../components/ProgressBar'
@@ -84,6 +84,14 @@ export default function Questionnaire() {
   const passedState = location.state || {}
   const [answers, setAnswers] = useState({})
   const [currentQ, setCurrentQ] = useState(0)
+  const fieldsetRef = useRef(null)
+
+  useEffect(() => {
+    if (fieldsetRef.current) {
+      fieldsetRef.current.focus({ preventScroll: false })
+      fieldsetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [currentQ])
 
   const q = questions[currentQ]
   const isLast = currentQ === questions.length - 1
@@ -129,7 +137,9 @@ export default function Questionnaire() {
         {/* Question card - key forces React to remount for each question so screen readers announce the new group */}
         <fieldset
           key={q.id}
-          className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-6"
+          ref={fieldsetRef}
+          tabIndex={-1}
+          className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-6 outline-none"
           aria-labelledby={`question-${q.id}`}
         >
           <legend className="sr-only" id={`question-${q.id}`}>
