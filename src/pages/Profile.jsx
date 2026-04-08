@@ -1,7 +1,7 @@
 import { Building2, MapPin, Users, Briefcase, Bot, Shield, Calendar, Edit3 } from 'lucide-react'
 
 const companyInfo = {
-  name: 'Acme Corp',
+  name: 'NovaTech Solutions',
   industry: 'Financial Services',
   size: 'Medium (50 to 249 employees)',
   location: 'Sofia, Bulgaria',

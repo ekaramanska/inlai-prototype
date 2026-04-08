@@ -54,7 +54,7 @@ export default function Onboarding() {
               type="text"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              placeholder="e.g. Acme Corp"
+              placeholder="e.g. NovaTech Solutions"
               autoComplete="organization"
               className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-orange focus:ring-2 focus:ring-orange/20 outline-none transition-all text-sm"
             />
