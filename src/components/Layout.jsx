@@ -1,9 +1,10 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Bot, LayoutDashboard, AlertCircle, Building2, Menu, X } from 'lucide-react'
+import { Bot, LayoutDashboard, AlertCircle, Building2, FileStack, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/templates', label: 'Templates', icon: FileStack },
   { to: '/updates', label: 'Policy Updates', icon: AlertCircle, badge: 2 },
   { to: '/profile', label: 'Company Profile', icon: Building2 },
 ]
