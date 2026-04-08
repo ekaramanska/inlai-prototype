@@ -126,9 +126,16 @@ export default function Questionnaire() {
           </p>
         </div>
 
-        {/* Question card */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-6">
-          <h2 className="text-lg font-semibold text-navy mb-3">
+        {/* Question card - key forces React to remount for each question so screen readers announce the new group */}
+        <fieldset
+          key={q.id}
+          className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-6"
+          aria-labelledby={`question-${q.id}`}
+        >
+          <legend className="sr-only" id={`question-${q.id}`}>
+            Question {currentQ + 1} of {questions.length}: {q.question}
+          </legend>
+          <h2 className="text-lg font-semibold text-navy mb-3" aria-hidden="true">
             {q.question}
           </h2>
 
@@ -139,8 +146,7 @@ export default function Questionnaire() {
             </div>
           )}
 
-          <fieldset>
-            <legend className="sr-only">{q.question}</legend>
+          <div>
             <div className="space-y-3">
               {q.options.map((opt) => {
                 const selected = answers[q.id] === opt.value
@@ -168,8 +174,8 @@ export default function Questionnaire() {
                 )
               })}
             </div>
-          </fieldset>
-        </div>
+          </div>
+        </fieldset>
 
         {/* Question dots */}
         <div className="flex justify-center gap-2 mb-6" aria-hidden="true">
