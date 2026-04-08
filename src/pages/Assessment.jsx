@@ -4,14 +4,12 @@ import { MessageSquare, Users, CreditCard, Eye, Stethoscope, ArrowRight, ArrowLe
 import ProgressBar from '../components/ProgressBar'
 
 const systems = [
-  { id: 'chatbot', icon: MessageSquare, name: 'Customer Service Chatbot', desc: 'Automated customer support using NLP', risk: 'limited' },
-  { id: 'hr', icon: Users, name: 'HR Screening Tool', desc: 'AI-assisted candidate evaluation and filtering', risk: 'high' },
-  { id: 'credit', icon: CreditCard, name: 'Credit Scoring System', desc: 'Automated creditworthiness assessment', risk: 'high' },
-  { id: 'moderation', icon: Eye, name: 'Content Moderation', desc: 'Automated detection of harmful content', risk: 'minimal' },
-  { id: 'medical', icon: Stethoscope, name: 'Medical Diagnosis Support', desc: 'AI-assisted clinical decision-making', risk: 'high' },
+  { id: 'chatbot', icon: MessageSquare, name: 'Customer Service Chatbot', desc: 'Automated customer support using NLP' },
+  { id: 'hr', icon: Users, name: 'HR Screening Tool', desc: 'AI-assisted candidate evaluation and filtering' },
+  { id: 'credit', icon: CreditCard, name: 'Credit Scoring System', desc: 'Automated creditworthiness assessment' },
+  { id: 'moderation', icon: Eye, name: 'Content Moderation', desc: 'Automated detection of harmful content' },
+  { id: 'medical', icon: Stethoscope, name: 'Medical Diagnosis Support', desc: 'AI-assisted clinical decision-making' },
 ]
-
-const riskOrder = ['minimal', 'limited', 'high']
 
 export default function Assessment() {
   const navigate = useNavigate()
@@ -24,11 +22,7 @@ export default function Assessment() {
   }
 
   const handleNext = () => {
-    const selectedSystems = systems.filter((s) => selected.includes(s.id))
-    const highestRisk = selectedSystems.reduce((max, s) => {
-      return riskOrder.indexOf(s.risk) > riskOrder.indexOf(max) ? s.risk : max
-    }, 'minimal')
-    navigate('/questionnaire', { state: { risk: highestRisk, selected } })
+    navigate('/questionnaire', { state: { selected } })
   }
 
   return (

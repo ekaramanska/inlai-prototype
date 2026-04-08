@@ -2,20 +2,14 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { AlertTriangle, CheckCircle2, Info, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-react'
 import ProgressBar from '../components/ProgressBar'
 
-const riskData = {
+const riskMeta = {
   minimal: {
     label: 'Minimal Risk',
     index: 0,
     color: 'text-emerald-600',
     bg: 'bg-emerald-50',
     icon: CheckCircle2,
-    description: 'Your AI system has been classified as Minimal Risk under the EU AI Act. No specific compliance obligations are required, but voluntary codes of conduct are encouraged.',
-    reasons: [
-      'System does not interact directly with individuals in sensitive contexts',
-      'No profiling or automated decision-making affecting rights',
-      'Low potential for harm to health, safety, or fundamental rights',
-      'Does not fall under any Annex III high-risk category',
-    ],
+    description: 'Based on your answers, your AI usage falls under Minimal Risk. No specific compliance obligations are required, but following voluntary codes of conduct is encouraged.',
   },
   limited: {
     label: 'Limited Risk',
@@ -23,13 +17,7 @@ const riskData = {
     color: 'text-yellow-600',
     bg: 'bg-yellow-50',
     icon: ShieldCheck,
-    description: 'Your AI system has been classified as Limited Risk under the EU AI Act. Transparency obligations apply: users must be informed they are interacting with an AI system.',
-    reasons: [
-      'System interacts directly with individuals (e.g. chatbot or virtual assistant)',
-      'Generates or manipulates content that users may perceive as human-made',
-      'Transparency requirements apply under Article 52 of the AI Act',
-      'No high-risk classification, but disclosure to users is mandatory',
-    ],
+    description: 'Based on your answers, your AI usage falls under Limited Risk. Transparency obligations apply: the people who interact with your AI system must be informed.',
   },
   high: {
     label: 'High Risk',
@@ -37,14 +25,74 @@ const riskData = {
     color: 'text-orange',
     bg: 'bg-orange/10',
     icon: AlertTriangle,
-    description: 'Your AI system has been classified as High Risk under the EU AI Act. This means specific compliance obligations apply to your organization.',
-    reasons: [
-      'System makes decisions affecting natural persons\u2019 access to essential services',
-      'Involves profiling of individuals based on personal data',
-      'Outputs may have significant impact on rights and safety',
-      'Falls under Annex III of the EU AI Act, classified as high-risk category',
-    ],
+    description: 'Based on your answers, your AI usage falls under High Risk. Your organisation must meet specific compliance obligations before August 2026.',
   },
+}
+
+/*
+ * Maps questionnaire answer values to human-readable risk factors.
+ * Only answers that actually raise risk are shown as reasons.
+ */
+const answerReasons = {
+  impact: {
+    customer_facing: 'Your AI system is used in customer-facing interactions, triggering transparency requirements.',
+    consequential: 'The AI system influences decisions that directly affect people, a key high-risk indicator under Annex III.',
+  },
+  personal_data: {
+    basic: 'The system processes personal data, which requires appropriate data governance measures.',
+    sensitive: 'Sensitive personal data (health, financial, biometric) is processed, significantly raising the risk classification.',
+  },
+  domain: {
+    regulated_light: 'Your sector (education, customer service, or content moderation) may trigger additional transparency obligations.',
+    regulated_heavy: 'Your sector is listed in Annex III of the EU AI Act as a high-risk application area.',
+  },
+  autonomy: {
+    assisted: 'Staff usually follow AI recommendations without independent verification, reducing human oversight.',
+    automated: 'The AI operates with minimal human review, which requires robust oversight mechanisms under the AI Act.',
+  },
+  transparency: {
+    partial: 'Affected individuals are not always informed about AI involvement, which may conflict with Article 50 requirements.',
+    no: 'People affected by the AI system are not informed they are interacting with AI, a direct transparency violation.',
+  },
+}
+
+/* Fallback reasons when the questionnaire was skipped (direct URL access). */
+const fallbackReasons = {
+  minimal: [
+    'AI is used for internal operations with no direct impact on individuals.',
+    'No sensitive personal data is processed by the system.',
+    'A human always reviews and approves AI-generated outputs.',
+    'The system does not fall under any Annex III high-risk category.',
+  ],
+  limited: [
+    'The AI system interacts with customers or generates content they see.',
+    'Transparency obligations apply under Article 50 of the AI Act.',
+    'Basic personal data is processed by the system.',
+    'Human oversight is present but could be strengthened.',
+  ],
+  high: [
+    'The AI system influences consequential decisions affecting individuals.',
+    'Sensitive personal data is processed by the system.',
+    'Your sector falls under Annex III high-risk application areas.',
+    'The system operates with limited human oversight.',
+  ],
+}
+
+function buildReasons(answers, riskKey) {
+  if (!answers || Object.keys(answers).length === 0) {
+    return fallbackReasons[riskKey]
+  }
+  const reasons = []
+  for (const [qId, value] of Object.entries(answers)) {
+    const map = answerReasons[qId]
+    if (map && map[value]) {
+      reasons.push(map[value])
+    }
+  }
+  if (reasons.length === 0) {
+    return fallbackReasons[riskKey]
+  }
+  return reasons
 }
 
 const levels = ['Minimal', 'Limited', 'High', 'Unacceptable']
@@ -54,8 +102,10 @@ export default function RiskResult() {
   const navigate = useNavigate()
   const location = useLocation()
   const riskKey = location.state?.risk || 'high'
-  const data = riskData[riskKey]
+  const answers = location.state?.answers || {}
+  const data = riskMeta[riskKey]
   const Icon = data.icon
+  const reasons = buildReasons(answers, riskKey)
 
   return (
     <div className="py-12 px-4 sm:px-6">
@@ -66,8 +116,8 @@ export default function RiskResult() {
           Risk Classification Result
         </h1>
 
-        {/* Risk gauge */}
         <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 mb-8">
+          {/* Risk gauge */}
           <div className="mb-8">
             <div className="flex justify-center gap-1 mb-4">
               {levels.map((level, i) => (
@@ -93,6 +143,7 @@ export default function RiskResult() {
             </div>
           </div>
 
+          {/* Result badge */}
           <div className={`inline-flex items-center gap-3 ${data.bg} rounded-2xl px-8 py-5 mb-6`}>
             <Icon className={`w-10 h-10 ${data.color}`} />
             <div className="text-left">
@@ -105,13 +156,14 @@ export default function RiskResult() {
             {data.description}
           </p>
 
+          {/* Reasons derived from answers */}
           <div className="bg-slate-50 rounded-xl p-6 text-left">
             <div className="flex items-center gap-2 text-navy font-semibold mb-4">
               <Info className="w-5 h-5" />
-              Why this classification?
+              Key factors from your assessment
             </div>
             <ul className="space-y-3">
-              {data.reasons.map((r, i) => (
+              {reasons.map((r, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-slate-600">
                   <span className={`w-5 h-5 rounded-full ${data.bg} ${data.color} flex items-center justify-center shrink-0 text-xs font-bold mt-0.5`}>
                     {i + 1}

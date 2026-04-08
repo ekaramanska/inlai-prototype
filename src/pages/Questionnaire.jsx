@@ -3,75 +3,80 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, HelpCircle } from 'lucide-react'
 import ProgressBar from '../components/ProgressBar'
 
+/*
+ * Questions written from the perspective of a BUSINESS that USES AI tools,
+ * not a company that builds them. Each answer carries a risk weight that
+ * feeds into the final risk classification.
+ *
+ * weight: 0 = lowers risk, 1 = neutral/limited, 2 = raises risk significantly
+ */
 const questions = [
   {
-    id: 'q1',
-    question: 'Does your system meet the definition of an "AI system" under the EU AI Act?',
-    hint: 'A machine-based system that operates with some level of autonomy and generates outputs such as predictions, recommendations, or decisions from its inputs (Art. 3, Regulation EU 2024/1689).',
+    id: 'impact',
+    question: 'What kind of decisions does the AI system help your company make?',
+    hint: 'The EU AI Act classifies systems based on how their outputs affect people. The more consequential the decisions, the higher the risk level.',
     options: [
-      { value: 'yes', label: 'Yes, it meets the definition' },
-      { value: 'no', label: 'No, it does not' },
-      { value: 'unsure', label: 'I am not sure' },
+      { value: 'internal', label: 'Internal operations only (e.g. summarising documents, generating reports)', weight: 0 },
+      { value: 'customer_facing', label: 'Customer-facing interactions (e.g. chatbot, product recommendations)', weight: 1 },
+      { value: 'consequential', label: 'Decisions that directly affect people (e.g. hiring, loan approvals, medical advice)', weight: 2 },
     ],
   },
   {
-    id: 'q2',
-    question: 'What is your organisation\'s role regarding this AI system?',
-    hint: 'Your role determines which obligations apply. Multiple roles are possible and obligations may overlap.',
+    id: 'personal_data',
+    question: 'Does the AI system process personal data about individuals?',
+    hint: 'Systems that profile people or process sensitive personal data (health, finances, biometrics) face stricter requirements under the AI Act.',
     options: [
-      { value: 'provider', label: 'Provider (develops or commissions AI for market placement)' },
-      { value: 'deployer', label: 'Deployer (uses the AI system under own authority)' },
-      { value: 'importer', label: 'Importer (places a third-country system on the EU market)' },
-      { value: 'distributor', label: 'Distributor (makes the system available without modification)' },
+      { value: 'no', label: 'No, it only works with non-personal business data', weight: 0 },
+      { value: 'basic', label: 'Yes, basic personal data (names, emails, purchase history)', weight: 1 },
+      { value: 'sensitive', label: 'Yes, sensitive data (health records, financial profiles, biometrics)', weight: 2 },
     ],
   },
   {
-    id: 'q3',
-    question: 'Is your AI system made available or put into service within the EU?',
-    hint: 'The AI Act applies when the system is placed on the EU market or its output is used within the EU.',
+    id: 'domain',
+    question: 'In which area does your company use the AI system?',
+    hint: 'The EU AI Act lists specific sectors in Annex III where AI use is considered high-risk regardless of other factors.',
     options: [
-      { value: 'yes', label: 'Yes, it is available or in service in the EU' },
-      { value: 'output_eu', label: 'No, but its output is used within the EU' },
-      { value: 'no', label: 'No, and its output is not used in the EU' },
+      { value: 'general', label: 'General business (marketing, analytics, content creation)', weight: 0 },
+      { value: 'regulated_light', label: 'Education, customer service, or content moderation', weight: 1 },
+      { value: 'regulated_heavy', label: 'Healthcare, finance, HR/recruitment, legal, or critical infrastructure', weight: 2 },
     ],
   },
   {
-    id: 'q4',
-    question: 'Could your AI system be used for any of the following prohibited practices?',
-    hint: 'Certain AI practices are banned outright under Article 5 of the AI Act, regardless of risk level.',
+    id: 'autonomy',
+    question: 'How much do your employees rely on the AI system\'s output?',
+    hint: 'Systems where a human always reviews and approves the output carry lower risk than those that act autonomously.',
     options: [
-      { value: 'manipulation', label: 'Manipulation or deception of persons' },
-      { value: 'scoring', label: 'Social scoring by public authorities' },
-      { value: 'biometric', label: 'Real-time biometric identification in public spaces' },
-      { value: 'none', label: 'None of the above' },
+      { value: 'advisory', label: 'As a suggestion only; a person always makes the final decision', weight: 0 },
+      { value: 'assisted', label: 'The AI recommends actions that staff usually follow', weight: 1 },
+      { value: 'automated', label: 'The AI makes or executes decisions with little or no human review', weight: 2 },
     ],
   },
   {
-    id: 'q5',
-    question: 'Is your AI system used in any of these high-risk areas?',
-    hint: 'Systems in Annex III areas are generally classified as high-risk and subject to strict requirements.',
+    id: 'transparency',
+    question: 'Are the people affected by the AI system aware they are interacting with AI?',
+    hint: 'Article 50 of the AI Act requires that people are informed when they interact with an AI system or consume AI-generated content.',
     options: [
-      { value: 'biometrics', label: 'Biometric identification or categorisation' },
-      { value: 'critical', label: 'Critical infrastructure (energy, transport, water, digital)' },
-      { value: 'education', label: 'Education and vocational training' },
-      { value: 'employment', label: 'Employment, worker management, or recruitment' },
-      { value: 'services', label: 'Access to essential services (credit scoring, insurance, benefits)' },
-      { value: 'law', label: 'Law enforcement, migration, or administration of justice' },
-      { value: 'none', label: 'None of the above' },
-    ],
-  },
-  {
-    id: 'q6',
-    question: 'Does your system interact directly with people or generate synthetic content?',
-    hint: 'Transparency obligations (Article 50) apply to certain AI systems regardless of their risk level.',
-    options: [
-      { value: 'interacts', label: 'Yes, it interacts with people (e.g. chatbot, virtual assistant)' },
-      { value: 'synthetic', label: 'Yes, it generates synthetic text, audio, image, or video content' },
-      { value: 'emotion', label: 'Yes, it recognises emotions or categorises people biometrically' },
-      { value: 'none', label: 'None of the above' },
+      { value: 'yes', label: 'Yes, we clearly disclose AI use to all affected people', weight: 0 },
+      { value: 'partial', label: 'Sometimes, but not in every case', weight: 1 },
+      { value: 'no', label: 'No, people are generally not informed', weight: 2 },
     ],
   },
 ]
+
+function computeRisk(answers) {
+  let score = 0
+  for (const q of questions) {
+    const ans = answers[q.id]
+    if (ans) {
+      const opt = q.options.find((o) => o.value === ans)
+      if (opt) score += opt.weight
+    }
+  }
+  // 0-2 minimal, 3-5 limited, 6+ high
+  if (score <= 2) return 'minimal'
+  if (score <= 5) return 'limited'
+  return 'high'
+}
 
 export default function Questionnaire() {
   const navigate = useNavigate()
@@ -91,7 +96,8 @@ export default function Questionnaire() {
 
   const handleNext = () => {
     if (isLast) {
-      navigate('/risk-result', { state: { ...passedState, answers } })
+      const risk = computeRisk(answers)
+      navigate('/risk-result', { state: { risk, answers } })
     } else {
       setCurrentQ((prev) => prev + 1)
     }
@@ -112,10 +118,10 @@ export default function Questionnaire() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-navy mb-2">
-            EU AI Act Compliance Check
+            Risk Assessment
           </h1>
           <p className="text-slate-500">
-            Based on the official EU Commission assessment framework.
+            Help us understand how your company uses AI so we can determine the right compliance level.
             Question {currentQ + 1} of {questions.length}.
           </p>
         </div>
@@ -192,9 +198,9 @@ export default function Questionnaire() {
           <button
             onClick={handleNext}
             disabled={!hasAnswer}
-            className={`inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-colors ${
               hasAnswer
-                ? 'bg-orange hover:bg-orange-dark text-white'
+                ? 'bg-orange hover:bg-orange-dark text-white cursor-pointer'
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
           >
@@ -203,10 +209,9 @@ export default function Questionnaire() {
           </button>
         </div>
 
-        {/* Source attribution */}
         <p className="text-xs text-slate-400 text-center mt-8">
-          Questions based on the EU AI Act Compliance Checker by the European Commission
-          (Regulation EU 2024/1689) and the ALTAI self-assessment framework.
+          Assessment criteria based on the EU AI Act (Regulation EU 2024/1689),
+          Annex III high-risk categories, and Article 50 transparency requirements.
         </p>
       </div>
     </div>
