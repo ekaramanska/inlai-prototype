@@ -109,7 +109,7 @@ export default function RiskResult() {
 
   return (
     <div className="py-12 px-4 sm:px-6">
-      <ProgressBar current={4} />
+      <ProgressBar current={3} />
 
       <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-2xl sm:text-3xl font-bold text-navy mb-8">
@@ -177,7 +177,7 @@ export default function RiskResult() {
 
         <div className="flex justify-between">
           <button
-            onClick={() => navigate('/questionnaire')}
+            onClick={() => navigate('/assessment')}
             className="inline-flex items-center gap-2 text-slate-500 hover:text-navy px-4 py-3 rounded-xl font-medium transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />

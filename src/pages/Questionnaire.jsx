@@ -105,7 +105,7 @@ export default function Questionnaire() {
 
   const handleBack = () => {
     if (isFirst) {
-      navigate('/assessment')
+      navigate('/onboarding')
     } else {
       setCurrentQ((prev) => prev - 1)
     }
@@ -113,7 +113,7 @@ export default function Questionnaire() {
 
   return (
     <div className="py-12 px-4 sm:px-6">
-      <ProgressBar current={3} />
+      <ProgressBar current={2} />
 
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
@@ -204,7 +204,7 @@ export default function Questionnaire() {
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
           >
-            {isLast ? 'See Risk Result' : 'Next Question'}
+            {isLast ? 'Analyze Risk' : 'Next'}
             <ArrowRight className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
